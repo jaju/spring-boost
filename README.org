@@ -77,13 +77,24 @@ org.msync.spring-boot-bugger> @state
 org.msync.spring-boot-bugger>
 #+end_src
 
+** Control the NREPL service via an end-point
+
+Pretty crude controls, and hopefully these path-prefixes should not clash with any existing registered path-mappings. Else, you are out of luck - get the source-code and modify the Java therein!
+
+*** Start it
+#+begin_src bash
+curl http://host:port/internal-dev/clojure/nrepl-start
+#+end_src
+
+*** Stop it
+#+begin_src bash
+curl http://host:port/internal-dev/clojure/nrepl-stop
+#+end_src
+
 * Caveats
 This is intended (currently) as a purely development-aiding dependency. It's tied to SpringBoot, but can be easily modified for other frameworks like Quarkus.
 
 Unroll the source into your application's source if you manage to convince your team/organization with a show of Clojure power and then add Clojure code for real! You can thank me later! ;-)
-
-* Plans
-This is intended as a development-only library. If compelling, I plan to add a basic controller/end-point to enable control of the /nrepl/ service and expose some useful app information.
 
 * License
 
