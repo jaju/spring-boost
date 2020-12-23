@@ -1,0 +1,98 @@
+* What is spring-boot-bugger?
+
+Note: Not intended for production, but simplifies paving the way for you to pitch Clojure to your app/organization.
+
+Ever wished to introduce Clojure into your enterprisey SpringBoot app (organization?) but didn't want to
+1. Add noise to your /build.gradle/ for injecting Clojure
+2. Want to start very small - just a simple NREPL into your SpringBoot app - and then use REPL-power to inspect and dynamically add functionality using Clojure
+
+Then, /spring-boot-bugger/ simplifies it for you!
+
+* Steps
+
+** Add dependency
+Currently, available in the /clojars/ repsitory. So, add it to repositories as well
+
+#+begin_src gradle
+repositories {
+  // Your other repositories
+  maven { url "https://clojars.org/repo"}
+}
+#+end_src
+
+#+begin_src gradle
+developmentOnly 'org.msync:spring-boot-bugger:0.1.0-SNAPSHOT'
+#+end_src
+
+Should work equally well with /maven/ - adjust for the /pom.xml/ syntax.
+
+Note: developmentOnly suggested, but /implementation/ also works and will enable NREPL in production! So, be careful.
+
+** Add /ComponentScan/
+Since we depend on Spring scanning and starting the NREPL-service, add /org.msync/ to ComponentScan
+
+Example:
+#+begin_src java
+// ...
+@SpringbootApplication
+@ComponentScan({"your.base.app.package", "org.msync"})
+public class MyApplication {
+    /...
+}
+#+end_src
+
+** Optional - Set the NREPL port
+By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
+
+#+begin_src properties
+# ...
+nrepl.port = 8190
+# ...
+#+end_src
+
+** Run "bootRun"
+#+begin_src bash
+./gradlew bootRun
+#+end_src
+
+And you should see something like the following
+#+BEGIN_QUOTE
+...
+2020-12-23 17:52:11.724  INFO 51843 --- [  restartedMain] o.msync.spring_boot_bugger.NreplService  : ******** NREPL server started on port 8190
+...
+#+END_QUOTE
+
+** Connect to the NREPL
+And hack away to glory!
+
+For your convenience, there's a namespace you can switch to and get hold of the /ApplicationContext/ object via the /state/ atom's /:ctx/ key.
+
+#+begin_src clojure
+user> @org.msync.spring-boot-bugger/state
+;; => {:ctx #object[org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext 0x60435032 "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@60435032, started on Wed Dec 23 18:03:16 IST 2020"]}
+user> (ns org.msync.spring-boot-bugger)
+;; => nil
+org.msync.spring-boot-bugger> @state
+;; => {:ctx #object[org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext 0x60435032 "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@60435032, started on Wed Dec 23 18:03:16 IST 2020"]}
+org.msync.spring-boot-bugger>
+#+end_src
+
+* Caveats
+This is intended (currently) as a purely development-aiding dependency. It's tied to SpringBoot, but can be easily modified for other frameworks like Quarkus.
+
+Unroll the source into your application's source if you manage to convince your team/organization with a show of Clojure power and then add Clojure code for real! You can thank me later! ;-)
+
+* License
+
+Copyright © 2020 - Ravindra R. Jaju
+
+This program and the accompanying materials are made available under the
+terms of the Eclipse Public License 2.0 which is available at
+[[http://www.eclipse.org/legal/epl-2.0][http://www.eclipse.org/legal/epl-2.0]].
+
+This Source Code may also be made available under the following Secondary
+Licenses when the conditions for such availability set forth in the Eclipse
+Public License, v. 2.0 are satisfied: GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or (at your
+option) any later version, with the GNU Classpath Exception which is available
+at [[https://www.gnu.org/software/classpath/license.html][https://www.gnu.org/software/classpath/license.html]].
