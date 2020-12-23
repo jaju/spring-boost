@@ -82,6 +82,9 @@ This is intended (currently) as a purely development-aiding dependency. It's tie
 
 Unroll the source into your application's source if you manage to convince your team/organization with a show of Clojure power and then add Clojure code for real! You can thank me later! ;-)
 
+* Plans
+This is intended as a development-only library. If compelling, I plan to add a basic controller/end-point to enable control of the /nrepl/ service and expose some useful app information.
+
 * License
 
 Copyright © 2020 - Ravindra R. Jaju
