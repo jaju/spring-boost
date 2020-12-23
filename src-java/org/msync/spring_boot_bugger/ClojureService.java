@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 @Service
 @Configuration
 @RestController
+@RequestMapping(value = "/internal-dev/clojure", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ClojureService {
 
     private static final Logger logger = Logger.getLogger(ClojureService.class.getName());
@@ -44,9 +46,9 @@ public class ClojureService {
         }
         try {
             server = serverStartFn.invoke(Clojure.read(":port"), Clojure.read(Integer.toString(port)));
-            logger.info("******** NREPL server started on port " + port);
+            logger.info("NREPL server started on port " + port);
         } catch (Exception e) {
-            logger.warning("********** Could not start NREPL... **************");
+            logger.warning("Could not start NREPL...");
             throw e;
         }
     }
@@ -58,14 +60,14 @@ public class ClojureService {
         try {
             serverStopFn.invoke(server);
             server = null;
-            logger.info("******** NREPL server stopped");
+            logger.info("NREPL server stopped");
         } catch (Exception e) {
-            logger.warning("********** Could not stop NREPL... **************");
+            logger.warning("Could not stop NREPL...");
             throw e;
         }
     }
 
-    @GetMapping(value = "/internal-dev/clojure/nrepl-start", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/nrepl-start")
     public ResponseEntity<Object> startNreplHandler() {
         try {
             startNrepl();
@@ -75,7 +77,7 @@ public class ClojureService {
         }
     }
 
-    @GetMapping(value = "/internal-dev/clojure/nrepl-stop", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/nrepl-stop")
     public ResponseEntity<Object> stopNreplHandler() {
         try {
             stopNrepl();
