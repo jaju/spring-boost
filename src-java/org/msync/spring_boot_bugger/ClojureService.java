@@ -71,9 +71,9 @@ public class ClojureService {
     public ResponseEntity<Object> startNreplHandler() {
         try {
             startNrepl();
-            return new ResponseEntity<>(Map.of("status", "ok"), HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("status", "started", "port", port), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("status", "not ok"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -81,9 +81,9 @@ public class ClojureService {
     public ResponseEntity<Object> stopNreplHandler() {
         try {
             stopNrepl();
-            return new ResponseEntity<>(Map.of("status", "ok"), HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("status", "stopped"), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("status", "not ok"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.BAD_REQUEST);
         }
     }
 

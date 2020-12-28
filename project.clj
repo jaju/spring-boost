@@ -1,6 +1,6 @@
 (def spring-version "5.3.2")
 
-(defproject org.msync/spring-boot-bugger "0.1.0"
+(defproject org.msync/spring-boot-bugger "0.1.0-SNAPSHOT"
 
   :description "Just add dependency, sprinkle some config, and run Clojure in your Springboot application."
 
@@ -20,11 +20,20 @@
 
   :dependencies [[org.clojure/clojure "1.10.2-rc1"]
                  [nrepl/nrepl "0.8.3"]]
+
+  :source-paths ["src" "src-java"]
   :java-source-paths ["src-java"]
+
   :repl-options {:init-ns org.msync.spring-boot-bugger}
   :aot [org.msync.spring-boot-bugger]
 
-  :deploy-repositories [["releases" {:url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+  :jar-inclusions [#"spring-boot-bugger-*-sources.jar"]
+
+  :deploy-repositories [#_["releases" {:url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                                      :creds :gpg}]
-                        ["snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots/"
-                                      :creds :gpg}]])
+                        #_["snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots/"
+                                      :creds :gpg}]
+                        ["releases" :clojars]
+                        ["snapshots" :clojars]]
+
+  )

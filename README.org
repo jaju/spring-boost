@@ -8,9 +8,62 @@ Ever wished to introduce Clojure into your enterprisey SpringBoot app (organizat
 
 Then, /spring-boot-bugger/ simplifies it for you!
 
-* Steps
+* Steps for Gradle
+(Modify accordingly for maven)
 
-** Add dependency
+** Preferred (Clever, but not battle-tested)
+
+Following these steps allow you to enable /NREPL/ by modifying two files in your repository
+- build.gradle
+- .gitignore
+The changes are pretty much inconsequential to your core project codebase and should be easy to push through with possibly non-existent pushback.
+
+These steps are suggestive and you can tweak - especially the names of files
+
+*** Add the following to your /.gitignore/
+#+begin_example
+/dev.gradle
+/**/DevWorx.java
+#+end_example
+
+*** Create /dev.gradle/
+(Or whatever name you'd like - match it with the entry in /.gitignore/)
+#+begin_src gradle
+repositories {
+     maven { url "https://clojars.org/repo" }
+}
+
+dependencies {
+    developmentOnly 'org.msync:spring-boot-bugger:0.1.0-SNAPSHOT'
+}
+#+end_src
+
+*** Update /build.gradle/
+Add the following to your /build.gradle/ - this allows you to tweak your build-script via an optionally present file.
+#+begin_src gradle
+if ((new File("dev.gradle")).isFile()) {
+    apply from: 'dev.gradle'
+}
+#+end_src
+
+*** Add a Java file to your codebase
+Name this file /DevWorx.java/ (to match your .gitignore entry), and keep it at an appropriate place - your base package
+Assuming your base package is /com.company.my_application/, the file should be created at *src/main/java/com/company/my_application/DevWorx.java*, unless you are not using standard Java+Gradle locations.
+#+begin_src java
+package com.company.my_application;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
+
+@Component
+@ComponentScan("org.msync.spring_boot_bugger") // This is where spring-boot-bugger Component-s live
+public class DevWorx {
+}
+#+end_src
+
+** Detailed Steps
+Dumb steps that require more verbose modifications to your build.gradle
+*** Add dependency
 Currently, available in the /clojars/ repsitory. So, add it to repositories as well
 
 #+begin_src gradle
@@ -24,24 +77,10 @@ repositories {
 developmentOnly 'org.msync:spring-boot-bugger:0.1.0-SNAPSHOT'
 #+end_src
 
-Should work equally well with /maven/ - adjust for the /pom.xml/ syntax.
+*** Add /ComponentScan/
+See addition of /DevWorx.java/ steps above
 
-Note: developmentOnly suggested, but /implementation/ also works and will enable NREPL in production! So, be careful.
-
-** Add /ComponentScan/
-Since we depend on Spring scanning and starting the NREPL-service, add /org.msync/ to ComponentScan
-
-Example:
-#+begin_src java
-// ...
-@SpringbootApplication
-@ComponentScan({"your.base.app.package", "org.msync"})
-public class MyApplication {
-    /...
-}
-#+end_src
-
-** Optional - Set the NREPL port
+* Optional - Set the NREPL port
 By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
 
 #+begin_src properties
@@ -50,7 +89,7 @@ nrepl.port = 8190
 # ...
 #+end_src
 
-** Run "bootRun"
+* Run "bootRun"
 #+begin_src bash
 ./gradlew bootRun
 #+end_src
@@ -62,7 +101,7 @@ And you should see something like the following
 ...
 #+END_QUOTE
 
-** Connect to the NREPL
+* Connect to the NREPL
 And hack away to glory!
 
 For your convenience, there's a namespace you can switch to and get hold of the /ApplicationContext/ object via the /state/ atom's /:ctx/ key.
@@ -77,7 +116,7 @@ org.msync.spring-boot-bugger> @state
 org.msync.spring-boot-bugger>
 #+end_src
 
-** Control the NREPL service via an end-point
+* Control the NREPL service via an end-point
 
 Pretty crude controls, and hopefully these path-prefixes should not clash with any existing registered path-mappings. Else, you are out of luck - get the source-code and modify the Java therein!
 
