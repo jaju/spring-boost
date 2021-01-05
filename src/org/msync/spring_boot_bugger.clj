@@ -15,14 +15,14 @@
   :init component-init)
 
 (defn -component-init [^ApplicationContext ctx]
-  [[] (atom ctx)])
+  [[] ctx])
 
 (defn -deref
   [this]
-  @(.state this))
+  (.state this))
 
 (defn -get-beans-of-type [this clazz]
-  (.getBeansOfType @(.state this) clazz))
+  (.getBeansOfType (.state this) clazz))
 
-(defn -get-environment []
-  (.getEnvironment @(.state this)))
+(defn -get-environment [this]
+  (.getEnvironment (.state this)))
