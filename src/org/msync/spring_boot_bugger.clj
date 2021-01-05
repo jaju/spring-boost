@@ -1,26 +1,28 @@
 (ns org.msync.spring-boot-bugger
-  (:import [org.springframework.context ApplicationContext]))
-
-(def state (atom {}))
+  (:import [org.springframework.context ApplicationContext]
+           [org.springframework.core.env Environment]))
 
 (gen-class
   :name
   ^{org.springframework.stereotype.Component ""}
   org.msync.spring_boot_bugger.ClojureComponent
-  :state _
+  :implements   [clojure.lang.IDeref]
+  :state state
   :prefix "-"
+  :methods [[get-beans-of-type [Class] Object]
+            [get-environment [] Environment]]
   :constructors {[org.springframework.context.ApplicationContext] []}
   :init component-init)
 
 (defn -component-init [^ApplicationContext ctx]
-  (swap! state assoc :ctx ctx)
-  [[] {}])
+  [[] (atom ctx)])
 
-(defn ^ApplicationContext get-application-context []
-  (:ctx @state))
+(defn -deref
+  [this]
+  @(.state this))
 
-(defn get-beans-of-type [clazz]
-  (.getBeansOfType (get-application-context) clazz))
+(defn -get-beans-of-type [this clazz]
+  (.getBeansOfType @(.state this) clazz))
 
-(defn get-environment []
-  (.getEnvironment (get-application-context)))
+(defn -get-environment []
+  (.getEnvironment @(.state this)))
