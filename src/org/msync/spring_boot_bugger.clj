@@ -6,7 +6,6 @@
   :name
   ^{org.springframework.stereotype.Component ""}
   org.msync.spring_boot_bugger.ClojureComponent
-  :implements   [clojure.lang.IDeref]
   :state state
   :prefix "-"
   :methods [[get-beans-of-type [Class] Object]
