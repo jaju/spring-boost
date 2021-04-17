@@ -1,4 +1,4 @@
-(def spring-version "5.3.2")
+(def spring-version "5.3.6")
 
 (defproject org.msync/spring-boot-bugger "0.1.0-SNAPSHOT"
 
@@ -18,7 +18,7 @@
               [[org.springframework/spring-context ~spring-version]
                [org.springframework/spring-web ~spring-version]]}}
 
-  :dependencies [[org.clojure/clojure "1.10.2-rc1"]
+  :dependencies [[org.clojure/clojure "1.10.3"]
                  [nrepl/nrepl "0.8.3"]]
 
   :source-paths ["src" "src-java"]

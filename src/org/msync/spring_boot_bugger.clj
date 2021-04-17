@@ -1,7 +1,7 @@
 (ns org.msync.spring-boot-bugger
   (:import [org.springframework.context ApplicationContext]))
 
-(def state (atom {}))
+(defonce state (atom {}))
 
 (gen-class
   :name
