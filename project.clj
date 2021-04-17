@@ -1,6 +1,6 @@
 (def spring-version "5.3.6")
 
-(defproject org.msync/spring-boot-bugger "0.1.0-SNAPSHOT"
+(defproject org.msync/spring-boot-bugger "0.1.0"
 
   :description "Just add dependency, sprinkle some config, and run Clojure in your Springboot application."
 
