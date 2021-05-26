@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    developmentOnly 'org.msync:spring-boot-bugger:0.1.0'
+    developmentOnly 'org.msync:spring-boot-bugger:0.1.1-SNAPSHOT'
 }
 #+end_src
 
@@ -74,7 +74,7 @@ repositories {
 #+end_src
 
 #+begin_src gradle
-developmentOnly 'org.msync:spring-boot-bugger:0.1.0'
+developmentOnly 'org.msync:spring-boot-bugger:0.1.1-SNAPSHOT'
 #+end_src
 
 *** Add /ComponentScan/

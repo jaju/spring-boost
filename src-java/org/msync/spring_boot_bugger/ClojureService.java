@@ -23,10 +23,10 @@ import java.util.logging.Logger;
 public class ClojureService {
 
     private static final Logger logger = Logger.getLogger(ClojureService.class.getName());
-    private static IFn serverStartFn;
-    private static IFn serverStopFn;
+    private static final IFn serverStartFn;
+    private static final IFn serverStopFn;
     private static Object server;
-    private int port = 7888;
+    private final int port;
 
     static {
         IFn require = Clojure.var("clojure.core", "require");
@@ -73,7 +73,7 @@ public class ClojureService {
             startNrepl();
             return new ResponseEntity<>(Map.of("status", "started", "port", port), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.CONFLICT);
         }
     }
 
@@ -83,7 +83,7 @@ public class ClojureService {
             stopNrepl();
             return new ResponseEntity<>(Map.of("status", "stopped"), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.CONFLICT);
         }
     }
 
