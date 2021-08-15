@@ -74,7 +74,7 @@ repositories {
 #+end_src
 
 #+begin_src gradle
-developmentOnly 'org.msync:spring-boot-bugger:0.1.1-SNAPSHOT'
+developmentOnly 'org.msync:spring-boot-bugger:0.2.0-SNAPSHOT'
 #+end_src
 
 *** Add /ComponentScan/
@@ -137,7 +137,7 @@ Unroll the source into your application's source if you manage to convince your 
 
 * License
 
-Copyright © 2020 - Ravindra R. Jaju
+Copyright © 2020-21 - Ravindra R. Jaju
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
