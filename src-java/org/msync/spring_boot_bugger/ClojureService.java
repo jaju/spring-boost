@@ -3,21 +3,18 @@ package org.msync.spring_boot_bugger;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-@Service
-@Configuration
 @RestController
 @RequestMapping(value = "/internal-dev/clojure", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ClojureService {
@@ -67,23 +64,33 @@ public class ClojureService {
         }
     }
 
+    /**
+     * Endpoint to request starting of the nrepl-server
+     *
+     * @return void
+     */
     @GetMapping(value = "/nrepl-start")
-    public ResponseEntity<Object> startNreplHandler() {
+    public Mono<ResponseEntity> startNreplHandler() {
         try {
             startNrepl();
-            return new ResponseEntity<>(Map.of("status", "started", "port", port), HttpStatus.OK);
+            return Mono.just(new ResponseEntity<>(Map.of("status", "started", "port", port), HttpStatus.OK));
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.CONFLICT);
+            return Mono.just(new ResponseEntity<>(Map.of("status", "error"), HttpStatus.CONFLICT));
         }
     }
 
+    /**
+     * Endpoint to request stopping of the nrepl-server
+     *
+     * @return void
+     */
     @GetMapping(value = "/nrepl-stop")
-    public ResponseEntity<Object> stopNreplHandler() {
+    public Mono<ResponseEntity> stopNreplHandler() {
         try {
             stopNrepl();
-            return new ResponseEntity<>(Map.of("status", "stopped"), HttpStatus.OK);
+            return Mono.just(new ResponseEntity<>(Map.of("status", "stopped"), HttpStatus.OK));
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("status", "error"), HttpStatus.CONFLICT);
+            return Mono.just(new ResponseEntity<>(Map.of("status", "error"), HttpStatus.CONFLICT));
         }
     }
 
