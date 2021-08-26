@@ -1,6 +1,6 @@
 (def version "0.2.0-SNAPSHOT")
 (def spring-version "5.3.9")
-(def spring-boot-version "2.5.3")
+(def spring-boot-version "2.5.4")
 
 (defproject org.msync/spring-boot-bugger version
 
@@ -30,6 +30,8 @@
 
   :java-source-paths ["src-java"]
 
+  :javac-options ["-source" "11" "-target" "11"]
+
   :dependencies [[org.clojure/clojure "1.10.3"]
                  [nrepl "0.8.3"]]
 
@@ -58,8 +60,6 @@
   :deploy-repositories {
                         "releases" {:url "https://oss.sonatype.org/service/local/staging/deploy/maven2" :creds :gpg}
                         "snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots" :creds :gpg}
-                        ;;"releases" :clojars
-                        ;;"snapshots" :clojars
                         }
 
   )
