@@ -1,44 +1,28 @@
 (ns org.msync.spring-boot-bugger
-  (:import [org.springframework.context ApplicationContext]
-           [org.springframework.core.env Environment]
-           [java.util Map]))
+  (:require [clojure.walk :refer [stringify-keys]])
+  (:import [org.springframework.http.server.reactive ServerHttpRequest]
+           [org.springframework.http.server PathContainer]))
 
-(defonce state (atom {}))
+(declare handler)
 
-(gen-class
-  :name
-  ^{org.springframework.stereotype.Component ""
-    org.springframework.web.bind.annotation.RestController ""
-    org.springframework.web.bind.annotation.RequestMapping "/clojure"}
-  org.msync.spring_boot_bugger.ClojureComponent
-  :state _
-  :prefix "-"
-  :constructors {[org.springframework.context.ApplicationContext] []}
-  :init component-init)
+(defn default-handler [& args]
+  (println args)
+  (stringify-keys {:status (int 501)
+                   :headers {:content-type "plain/text"}
+                   :body "[spring-boot-bugger] Default: There is no handler installed."}))
 
-(defn -component-init [^ApplicationContext ctx]
-  (swap! state assoc :ctx ctx)
-  [[] {}])
+(defn -root-handler [^ServerHttpRequest request]
+  (let [path (.getPath request)
+        context-path (.. path ^PathContainer contextPath ^String value)
+        application-path (.. path ^PathContainer pathWithinApplication ^String value)
+        http-method (.getMethodValue request)]
+    (println (str "path = " path))
+    (println (str "method = " http-method))
+    (#'handler {:context-path context-path
+                :application-path application-path
+                :http-method http-method})))
 
-(defn ^ApplicationContext get-application-context []
-  (:ctx @state))
+(defn set-handler! [new-handler]
+  (alter-var-root #'handler (constantly new-handler)))
 
-(defn ^String get-id []
-  (.getId (get-application-context)))
-
-(defn ^String get-application-name []
-  (.getApplicationName (get-application-context)))
-
-(defn ^ApplicationContext get-parent []
-  (.getParent (get-application-context)))
-
-(defn ^Environment get-environment []
-  (.getEnvironment (get-application-context)))
-
-(defn ^Map get-beans-of-type [clazz]
-  (.getBeansOfType (get-application-context) clazz))
-
-(defn ^Map get-beans-with-annotation [annotation]
-  (.getBeansWithAnnotation (get-application-context) annotation))
-
-
+(set-handler! default-handler)

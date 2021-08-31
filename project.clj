@@ -1,6 +1,7 @@
 (def version "0.2.0-SNAPSHOT")
 (def spring-version "5.3.9")
 (def spring-boot-version "2.5.4")
+(def core-version "1.10.3")
 
 (defproject org.msync/spring-boot-bugger version
 
@@ -32,14 +33,14 @@
 
   :javac-options ["-source" "11" "-target" "11"]
 
-  :dependencies [[org.clojure/clojure "1.10.3"]
+  :dependencies [[org.clojure/clojure ~core-version]
                  [nrepl "0.8.3"]]
 
   :javadoc-opts {:package-names ["org.msync.spring_boot_bugger"]
                  :additional-args ["-windowtitle" "SpringBoot Bugger Javadoc"
                                    "-quiet"
                                    "-link" "https://docs.oracle.com/en/java/javase/11/docs/api/"
-                                   "-link" "https://www.javadoc.io/static/org.clojure/clojure/1.10.3"
+                                   "-link" ~(str "https://www.javadoc.io/static/org.clojure/clojure/" core-version)
                                    "-link" ~(str "https://javadoc.io/doc/org.springframework/spring-beans/" spring-version)
                                    "-link" ~(str "https://javadoc.io/doc/org.springframework/spring-web/" spring-version)
                                    "-link" "https://projectreactor.io/docs/core/release/api/"]}
@@ -51,7 +52,7 @@
 
   :repl-options {:init-ns org.msync.spring-boot-bugger}
 
-  :aot [org.msync.spring-boot-bugger]
+  :aot [org.msync.spring-boot-bugger.application-context]
 
   :jar-inclusions [#"spring-boot-bugger-*-sources.jar"]
 
