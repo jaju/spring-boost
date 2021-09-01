@@ -14,7 +14,7 @@ Then, ~spring-boot-bugger~ simplifies it for you!
 ** Preferred (Clever, but not battle-tested)
 
 Following these steps allow you to enable /NREPL/ by modifying two files in your repository
-- build.gradle
+- build.gradle[.kt]
 - .gitignore
 The changes are pretty much inconsequential to your core project codebase and should be easy to push through with possibly non-existent pushback.
 
@@ -26,8 +26,8 @@ These steps are *suggestive* and you can tweak - especially the names of files
 /**/DevWorx.java
 #+end_example
 
-*** Create ~dev.gradle~ or ~dev.gradle.kt~
-(Or whatever name you'd like - match it with the entry in /.gitignore/)
+*** Create ~dev.gradle.kt~ (or ~dev.gradle.kt~)
+(Or whatever name you'd like - match it with the entry in ~.gitignore~)
 #+begin_src kotlin
 repositories {
     maven {
@@ -98,7 +98,7 @@ Initializing ClojureComponent...
 * Connect to the NREPL
 And hack away to glory!
 
-For your convenience, there's a namespace you can switch to and get hold of the /ApplicationContext/ object via the /state/ atom's /:ctx/ key.
+For your convenience, there's a namespace you can switch to and get hold of the ~ApplicationContext~ object via the /state/ atom's ~:ctx~ key.
 
 #+begin_src clojure
 user> @org.msync.spring-boot-bugger.application-context/state
@@ -110,7 +110,7 @@ user> @org.msync.spring-boot-bugger.application-context/state
 
 * Control the NREPL service via an end-point
 
-Pretty crude controls, and hopefully these path-prefixes should not clash with any existing registered path-mappings. Else, you are out of luck - get the source-code and modify the Java therein!
+Pretty crude controls. Modify host, port and the path-prefix depending on how you've configured it in your ~application.yml~.
 
 *** Start it
 #+begin_src bash
