@@ -127,7 +127,7 @@ public class ClojureConfiguration {
         return RouterFunctions
             .route(POST(path("/stop-nrepl")), this::stopNreplHandler)
             .andRoute(POST(path("/start-nrepl")), this::startNreplHandler)
-            .andRoute(RequestPredicates.path("/**"), requestHandler::clojureHandler);
+            .andRoute(RequestPredicates.path(path("/**")), requestHandler::clojureHandler);
     }
 
 }
