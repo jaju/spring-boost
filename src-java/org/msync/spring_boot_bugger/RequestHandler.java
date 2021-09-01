@@ -3,16 +3,16 @@ package org.msync.spring_boot_bugger;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.Keyword;
-import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class RequestHandler {
@@ -64,6 +64,13 @@ public class RequestHandler {
         return known;
     }
 
+    private static final Set<HttpMethod> httpMethodsWithBody = Set.of(
+      HttpMethod.POST,
+      HttpMethod.PUT,
+      HttpMethod.PATCH,
+      HttpMethod.DELETE
+    );
+
     /**
      * @param request - Self-evident. Contains all the required information for handling
      *                a request
@@ -75,8 +82,7 @@ public class RequestHandler {
 
         final var clojureRequest = (Map<Keyword, Object>) toRingSpec.invoke(uri, request);
 
-        Flux<DataBuffer> body = (Flux<DataBuffer>) clojureRequest.get(Keyword.intern("body"));
-        if (Objects.nonNull(body)) {
+        if (httpMethodsWithBody.contains(request.method())) {
             var headers = (Map<String, String>) clojureRequest.get(Keyword.intern("headers"));
             var contentType = headers.get("content-type");
             var inferredClass = contentTypeToJavaType(contentType);

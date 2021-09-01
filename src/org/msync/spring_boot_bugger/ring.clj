@@ -52,5 +52,5 @@
         {:ssl-client-cert (aget (.getPeerCertificates ssl-info) 0)})
       (when-let [query-string (to-query-string http-request)]
         {:query-string query-string})
-      (when-let [body (.getBody http-request)]
+      #_(when-let [body (.getBody http-request)]
         {:body body}))))

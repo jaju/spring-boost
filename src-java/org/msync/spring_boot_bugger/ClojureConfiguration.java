@@ -105,7 +105,7 @@ public class ClojureConfiguration {
         }
     }
 
-    public ClojureConfiguration(@Value("${nrepl.port:7888}") int nreplPort,
+    public ClojureConfiguration(@Value("${clojure-component.nrepl-port:7888}") int nreplPort,
                                 @Value("${clojure-component.root-path}") String rootPath) {
         this.nreplPort = nreplPort;
         this.rootPath = rootPath;
