@@ -8,6 +8,29 @@ Ever wished to introduce Clojure into your enterprisey SpringBoot app (organizat
 
 Then, ~spring-boot-bugger~ simplifies it for you!
 
+* The Pitch: Sample Application Code
+Here is an example code - using Compojure - that you can use in your SpringBoot application!
+It works along-side your existing Java code, without interfering, and you can access Clojure from your Java, and vice-versa!
+#+begin_src clojure
+(ns scratch
+  (:require
+   [org.msync.spring-boot-bugger :as bugger]
+   [compojure.core :refer :all]
+   [compojure.route :as route]))
+
+(defroutes app
+  (GET "/" [] "<h1>Hello World</h1>")
+  (POST "/echo/:greetings" [greetings :as request]
+        {:status 200
+         :content-type "application/json"
+         :body {:greetings greetings :message (:body request)}})
+  (route/not-found "<h1>Page not found</h1>"))
+
+(bugger/set-handler! app)
+#+end_src
+
+Note that the paths are relative to the base path set in ~application.yml~.
+
 * Steps for Gradle
 (Modify accordingly for maven)
 
@@ -70,7 +93,6 @@ public class DevWorx {
 }
 #+end_src
 
-
 * Configure Springboot Application
 By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
 
@@ -121,28 +143,6 @@ curl http://host:port/internal/clojure/nrepl-start
 #+begin_src bash
 curl http://host:port/internal/clojure/nrepl-stop
 #+end_src
-
-* Sample Application Code
-Here is an example code - using Compojure
-#+begin_src clojure
-(ns scratch
-  (:require
-   [org.msync.spring-boot-bugger :as bugger]
-   [compojure.core :refer :all]
-   [compojure.route :as route]))
-
-(defroutes app
-  (GET "/" [] "<h1>Hello World</h1>")
-  (POST "/echo/:greetings" [greetings :as request]
-        {:status 200
-         :content-type "application/json"
-         :body {:greetings greetings :message (:body request)}})
-  (route/not-found "<h1>Page not found</h1>"))
-
-(bugger/set-handler! app)
-#+end_src
-
-Note that the paths are relative to the base path set in ~application.yml~.
 
 * Caveats
 This is intended (currently) as a purely development-aiding dependency. It's tied to SpringBoot, but can be easily modified for other frameworks like Quarkus.
