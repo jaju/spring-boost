@@ -66,6 +66,10 @@ These steps are *suggestive* and you can tweak - especially the names of files
 #+begin_src kotlin
 repositories {
     maven {
+        name = "Clojars"
+        url = uri("https://clojars.org/repo")
+    }
+    maven {
         name("Sonatype Snapshots")
         url("https://oss.sonatype.org/content/repositories/snapshots")
         mavenContent {
