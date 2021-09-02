@@ -34,12 +34,12 @@ public class RequestHandler {
     static {
         IFn require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("org.msync.spring-boot-bugger"));
-        require.invoke(Clojure.read("org.msync.spring-boot-bugger.ring"));
+        require.invoke(Clojure.read("org.msync.spring-boot-bugger.ring-like"));
         require.invoke(Clojure.read("clojure.walk"));
 
         assoc = Clojure.var("clojure.core", "assoc");
         nameFn = Clojure.var("clojure.core", "name");
-        toRingSpec = Clojure.var("org.msync.spring-boot-bugger.ring", "to-ring-spec");
+        toRingSpec = Clojure.var("org.msync.spring-boot-bugger.ring-like", "to-ring-spec");
         rootHandler = Clojure.var("org.msync.spring-boot-bugger", "-root-handler");
         stringifyKeys = Clojure.var("clojure.walk", "stringify-keys");
     }
@@ -48,14 +48,14 @@ public class RequestHandler {
         return path.substring(rootPath.length());
     }
 
-    static private Map<MediaType, Class> mediaTypeToClass = Map.of(
+    static private Map<MediaType, Class<?>> mediaTypeToClass = Map.of(
         MediaType.APPLICATION_JSON, Map.class,
         MediaType.APPLICATION_FORM_URLENCODED, MultiValueMap.class
     );
 
-    private static Class contentTypeToJavaType(String contentType) {
+    private static Class<?> contentTypeToJavaType(String contentType) {
         MediaType mt = MediaType.valueOf(contentType);
-        Class known = mediaTypeToClass.get(mt);
+        Class<?> known = mediaTypeToClass.get(mt);
 
         if (Objects.isNull(known)) {
             known = String.class;

@@ -1,12 +1,8 @@
-(ns org.msync.spring-boot-bugger.ring
+(ns org.msync.spring-boot-bugger.ring-like
   (:require [clojure.string])
   (:import [org.springframework.http.server.reactive ServerHttpRequest SslInfo]
            [org.springframework.web.reactive.function.server ServerRequest]
-           [org.springframework.util MultiValueMap]
-           [reactor.core.publisher Flux]
-           [org.msync.spring_boot_bugger Utils]
-           [org.springframework.web.reactive.function BodyInserters BodyExtractors]
-           [org.springframework.http MediaType]))
+           [org.springframework.util MultiValueMap]))
 
 ;; Reference - https://github.com/ring-clojure/ring/blob/master/SPEC
 
@@ -49,8 +45,8 @@
        :protocol protocol
        :headers headers}
       (when-let [^SslInfo ssl-info (.getSslInfo http-request)]
+        ;; It's an array, but ring-spec expects just one
         {:ssl-client-cert (aget (.getPeerCertificates ssl-info) 0)})
       (when-let [query-string (to-query-string http-request)]
-        {:query-string query-string})
-      #_(when-let [body (.getBody http-request)]
-        {:body body}))))
+        ;; Inefficient because spring-framework already parses it, but we re-create an approximation of the query-string
+        {:query-string query-string}))))
