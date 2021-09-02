@@ -9,6 +9,18 @@ Ever wished to introduce Clojure into your enterprisey SpringBoot app (organizat
 Then, ~spring-boot-bugger~ simplifies it for you!
 
 * The Pitch: Sample Application Code
+** Configure Springboot Application
+By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
+
+#+begin_src yaml
+# ...
+clojure-component:
+  nrepl-port: 8190
+  root-path: /internal/clojure
+# ...
+#+end_src
+
+** Write code
 Here is an example code - using Compojure - that you can use in your SpringBoot application!
 It works along-side your existing Java code, without interfering, and you can access Clojure from your Java, and vice-versa!
 #+begin_src clojure
@@ -29,7 +41,7 @@ It works along-side your existing Java code, without interfering, and you can ac
 (bugger/set-handler! app)
 #+end_src
 
-Note that the paths are relative to the base path set in ~application.yml~.
+Note that the paths are relative to the base path set in ~application.yml~. Hence, ~/echo/:greetings~ will be accessible at ~/internal/clojure/echo/:greetings~.
 
 * Steps for Gradle
 (Modify accordingly for maven)
@@ -91,17 +103,6 @@ import org.springframework.stereotype.Component;
 @ComponentScan("org.msync.spring_boot_bugger")
 public class DevWorx {
 }
-#+end_src
-
-* Configure Springboot Application
-By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
-
-#+begin_src yaml
-# ...
-clojure-component:
-  nrepl-port: 8190
-  root-path: /internal/clojure
-# ...
 #+end_src
 
 * Run "bootRun"
