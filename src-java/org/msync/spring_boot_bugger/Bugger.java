@@ -10,6 +10,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
@@ -20,15 +21,16 @@ import java.util.logging.Logger;
 /**
  * Bean to control the nrepl-server
  */
-@Configuration(proxyBeanMethods = false)
-public class ClojureConfiguration {
+@Component
+public class Bugger {
 
     private final int nreplPort;
     private final String rootPath;
+
     private static final IFn serverStartFn;
     private static final IFn serverStopFn;
     private static Object server;
-    private static final Logger logger = Logger.getLogger(ClojureConfiguration.class.getName());
+    private static final Logger logger = Logger.getLogger(Bugger.class.getName());
 
 
     static {
@@ -105,11 +107,11 @@ public class ClojureConfiguration {
         }
     }
 
-    public ClojureConfiguration(@Value("${clojure-component.nrepl-port:7888}") int nreplPort,
-                                @Value("${clojure-component.root-path}") String rootPath) {
-        this.nreplPort = nreplPort;
-        this.rootPath = rootPath;
-        startNrepl();
+    public Bugger(BuggerConfiguration config) {
+        this.nreplPort = config.getNreplPort();
+        this.rootPath = config.getRootPath();
+        if (config.isNreplStart())
+            startNrepl();
     }
 
     @Bean

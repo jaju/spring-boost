@@ -1,9 +1,11 @@
 (ns org.msync.spring-boot-bugger.application-context
   (:import [org.springframework.core.env Environment]
            [java.util Map]
-           [org.springframework.context ApplicationContext]))
+           [org.springframework.context ApplicationContext]
+           [java.util.logging Logger]))
 
 (defonce state (atom {}))
+(defonce ^Logger log (Logger/getLogger (str *ns*)))
 
 (gen-class
   :name
@@ -17,7 +19,7 @@
   :init component-init)
 
 (defn- -component-init [^ApplicationContext ctx]
-  (println "Initializing ClojureComponent...")
+  (.info log "Initializing the ClojureComponent")
   (swap! state assoc :ctx ctx)
   [[] {}])
 

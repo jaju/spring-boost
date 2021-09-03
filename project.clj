@@ -18,7 +18,8 @@
 
   :profiles {:provided
              {:dependencies
-              [[org.springframework/spring-context ~spring-version]
+              [[org.springframework.boot/spring-boot ~spring-boot-version]
+               [org.springframework/spring-context ~spring-version]
                [org.springframework/spring-webflux ~spring-version]]}
 
              :dev
