@@ -49,27 +49,27 @@ public class Bugger {
         var.invoke(applicationContext);
     }
 
-    private void startNrepl() {
+    private synchronized void startNrepl() {
         if (Objects.nonNull(server)) {
             throw new RuntimeException("NREPL service already running.");
         }
         try {
-            server = serverStartFn.invoke(Clojure.read(":port"), Clojure.read(Integer.toString(nreplPort)));
-            logger.info(() -> "[spring-boot-bugger] nREPL server started on port = " + nreplPort);
+            server = serverStartFn.invoke(Clojure.read(":port"), nreplPort);
+            logger.info(() -> "nREPL server started on port = " + nreplPort);
         } catch (Exception e) {
             logger.warning(() -> "Could not start nREPL... " + e.getMessage());
             throw e;
         }
     }
 
-    private void stopNrepl() {
+    private synchronized void stopNrepl() {
         if (Objects.isNull(server)) {
             throw new RuntimeException("nREPL server is already stopped.");
         }
         try {
             serverStopFn.invoke(server);
             server = null;
-            logger.info(() -> "NREPL server stopped.");
+            logger.info("NREPL server stopped.");
         } catch (Exception e) {
             logger.warning(() -> "Could not stop nREPL... " + e.getMessage());
             throw e;

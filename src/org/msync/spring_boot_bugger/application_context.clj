@@ -9,9 +9,7 @@
 
 (gen-class
   :name
-  ^{org.springframework.stereotype.Component ""
-    org.springframework.web.bind.annotation.RestController ""
-    org.springframework.web.bind.annotation.RequestMapping "/clojure"}
+  ^{org.springframework.stereotype.Component ""}
   org.msync.spring_boot_bugger.ClojureComponent
   :state _
   :prefix "-"

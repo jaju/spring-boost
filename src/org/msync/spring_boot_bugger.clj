@@ -10,7 +10,7 @@
   (.info log (str "Using default handler with args: " args))
   {:status 501
    :headers {:content-type "text/plain"}
-   :body "[spring-boot-bugger] Default: There is no handler installed."})
+   :body "Default: There is no handler installed."})
 
 (defn -root-handler [^Map request]
   (#'handler request))
