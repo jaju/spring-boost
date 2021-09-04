@@ -16,7 +16,9 @@ By default, port 7888 is used. But add /nrepl.port/ to your application.properti
 # ...
 clojure-component:
   nrepl-port: 8190
+  nrepl-start: true
   root-path: /internal/clojure
+  app-init-symbol: org.msync.spring-clj.core/main
 # ...
 #+end_src
 
@@ -24,29 +26,35 @@ clojure-component:
 Here is an example code - using Compojure - that you can use in your SpringBoot application!
 It works along-side your existing Java code, without interfering, and you can access Clojure from your Java, and vice-versa!
 #+begin_src clojure
-(ns scratch
-  (:require
-   [org.msync.spring-boot-bugger :as bugger]
-   [compojure.core :refer :all]
-   [compojure.route :as route]))
+(ns org.msync.spring-clj.core
+  (:require [org.msync.spring-boot-bugger :as bugger]
+            [compojure.core :refer :all]
+            [compojure.route :refer [not-found]])
+  (:import [java.util.logging Logger]))
+
+(defonce logger (Logger/getLogger (str *ns*)))
 
 (defroutes app
   (GET "/" [] "<h1>Hello World</h1>")
-  (POST "/echo/:greetings" [greetings :as request]
-        {:status 200
-         :content-type "application/json"
-         :body {:greetings greetings :message (:body request)}})
-  (route/not-found "<h1>Page not found</h1>"))
+  (GET "/echo/:greeter" [greeter]
+    (str "Hello, " greeter))
+  (POST "/echo/:greetings" [greeter :as request]
+    {:status 200
+     :headers {:content-type "application/json"}
+     :body {:greetings (str "Hello, " greeter)
+            :echo (:body request)}})
+  (not-found "<h1>Page not found</h1>"))
 
-(bugger/set-handler! app)
+(defn main [application-context]
+  ;; Any init-routines, including those that need the application context.
+  (.info logger (str "[spring-clj] Initializing clojure app..."))
+  (bugger/set-handler! app))
 #+end_src
 
 Note that the paths are relative to the base path set in ~application.yml~. Hence, ~/echo/:greetings~ will be accessible at ~/internal/clojure/echo/:greetings~.
 
 * Steps for Gradle
 (Modify accordingly for maven)
-
-** Preferred (Clever, but not battle-tested)
 
 Following these steps allow you to enable /NREPL/ by modifying two files in your repository
 - build.gradle[.kt]
@@ -99,26 +107,41 @@ Assuming your base package is ~com.company.my_application~, the file should be c
 package com.company.my_application;
 
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("dev")
 @ComponentScan("org.msync.spring_boot_bugger")
 public class DevWorx {
 }
 #+end_src
 
+*** Ensure your clojure code is copied to the classpath
+Here's some sample gradle config to help you do that. Assuming your clojure code is in ~src/main/clojure~
+
+#+begin_src kotlin
+tasks.register<Copy>("copyClojure") {
+    into("build/classes/java/main") {
+        destinationDir = file(".")
+        from("src/main/clojure")
+    }
+}
+
+tasks.getByName("bootRun").dependsOn("copyClojure")
+tasks.getByName("bootJar").dependsOn("copyClojure")
+#+end_src
+
 * Run "bootRun"
 #+begin_src bash
-./gradlew bootRun --args='--spring.profiles.active=dev'
+./gradlew bootRun
 #+end_src
 
 And you should see something like the following
 #+BEGIN_QUOTE
 ...
-[2021-09-01 21:47:31,121] INFO  [restartedMain] org.msync.spring_boot_bugger.ClojureConfiguration::startNrepl [spring-boot-bugger] NREPL server started on port 8190
-Initializing ClojureComponent...
+[2021-09-04 12:55:05,450] INFO  [main] org.msync.spring_boot_bugger.application_context$_component_init::invokeStatic Initializing the ClojureComponent
+[2021-09-04 12:55:06,091] INFO  [main] org.msync.spring_boot_bugger.Bugger::startNrepl [spring-boot-bugger] nREPL server started on port = 8190
+[2021-09-04 12:55:06,093] INFO  [main] org.msync.spring_boot_bugger.Bugger::setupAppInit Initializing clojure code: org.msync.spring-clj.core/main
+[2021-09-04 12:55:07,224] INFO  [main] jdk.internal.reflect.NativeMethodAccessorImpl::invoke0 [spring-clj] Initializing clojure app...
 ...
 #+END_QUOTE
 
@@ -141,12 +164,12 @@ Pretty crude controls. Modify host, port and the path-prefix depending on how yo
 
 *** Start it
 #+begin_src bash
-curl http://host:port/internal/clojure/nrepl-start
+curl -XPOST http://host:port/internal/clojure/nrepl-start
 #+end_src
 
 *** Stop it
 #+begin_src bash
-curl http://host:port/internal/clojure/nrepl-stop
+curl -XPOST http://host:port/internal/clojure/nrepl-stop
 #+end_src
 
 * Caveats
