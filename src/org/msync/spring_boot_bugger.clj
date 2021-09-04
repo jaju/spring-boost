@@ -3,10 +3,10 @@
   (:import [java.util Map]
            [java.util.logging Logger]))
 
-(declare handler)
+(declare ^:private handler)
 (defonce ^Logger log (Logger/getLogger (str *ns*)))
 
-(defn default-handler [& args]
+(defn -default-handler [& args]
   (.info log (str "Using default handler with args: " args))
   {:status 501
    :headers {:content-type "text/plain"}
@@ -18,4 +18,5 @@
 (defn set-handler! [new-handler]
   (alter-var-root #'handler (constantly new-handler)))
 
-(set-handler! default-handler)
+(defonce _
+  (set-handler! -default-handler))

@@ -16,15 +16,17 @@ import java.io.PipedOutputStream;
 @Component
 public class Utils {
 
+    public static final IFn require;
     public static final IFn assocFn;
     public static final IFn dissocFn;
     public static final IFn nameFn;
     public static final IFn toRingSpecFn;
     public static final IFn rootHandlerFn;
+    public static final IFn setHandlerFn;
     public static final IFn stringifyKeysFn;
 
     static {
-        IFn require = Clojure.var("clojure.core", "require");
+        require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("org.msync.spring-boot-bugger"));
         require.invoke(Clojure.read("org.msync.spring-boot-bugger.ring-like"));
         require.invoke(Clojure.read("clojure.walk"));
@@ -34,6 +36,7 @@ public class Utils {
         nameFn = Clojure.var("clojure.core", "name");
         toRingSpecFn = Clojure.var("org.msync.spring-boot-bugger.ring-like", "to-ring-spec");
         rootHandlerFn = Clojure.var("org.msync.spring-boot-bugger", "-root-handler");
+        setHandlerFn = Clojure.var("org.msync.spring-boot-bugger", "set-handler!");
         stringifyKeysFn = Clojure.var("clojure.walk", "stringify-keys");
     }
 
