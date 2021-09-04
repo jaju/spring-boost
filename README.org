@@ -8,6 +8,8 @@ Ever wished to introduce Clojure into your enterprisey SpringBoot app (organizat
 
 Then, ~spring-boot-bugger~ simplifies it for you!
 
+If you want a complete example of how it works, check out [[https://github.com/jaju/spring-boot-bugger-example][jaju/spring-boot-bugger-example]].
+
 * The Pitch: Sample Application Code
 ** Configure Springboot Application
 By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
