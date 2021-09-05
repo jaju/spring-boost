@@ -7,6 +7,9 @@ Then, ~spring-boot-bugger~ simplifies it for you!
 
 A complete example of how it works can be found at [[https://github.com/jaju/spring-boot-bugger-example][jaju/spring-boot-bugger-example]].
 
+** Caveat
+For the web-endpoints, the library assumes *Spring Webflux*. It will not work with standard, thread-ed spring-boot.
+
 * The Pitch: Sample Application Code
 Here's how you can write Clojure code, using *Compojure*, with Springboot.
 The interface is _ring like_ - Mostly ring, but with a few quirks that should not matter for most common use-cases.
