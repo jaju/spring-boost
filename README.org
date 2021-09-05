@@ -120,14 +120,14 @@ And, *run*!
 #+end_src
 
 And you should see something like the following
-#+BEGIN_QUOTE
+#+BEGIN_EXAMPLE
 ...
 [2021-09-04 12:55:05,450] INFO  [main] org.msync.spring_boot_bugger.application_context$_component_init::invokeStatic Initializing the ClojureComponent
 [2021-09-04 12:55:06,091] INFO  [main] org.msync.spring_boot_bugger.Bugger::startNrepl [spring-boot-bugger] nREPL server started on port = 8190
 [2021-09-04 12:55:06,093] INFO  [main] org.msync.spring_boot_bugger.Bugger::setupAppInit Initializing clojure code: org.msync.spring-clj.core/main
 [2021-09-04 12:55:07,224] INFO  [main] jdk.internal.reflect.NativeMethodAccessorImpl::invoke0 [spring-clj] Initializing clojure app...
 ...
-#+END_QUOTE
+#+END_EXAMPLE
 
 * Connect to the NREPL
 
