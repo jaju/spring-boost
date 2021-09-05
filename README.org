@@ -9,6 +9,7 @@ A complete example of how it works can be found at [[https://github.com/jaju/spr
 
 ** Caveat
 For the web-endpoints, the library assumes *Spring Webflux*. It will not work with standard, thread-ed spring-boot.
+But ~nREPL~ will work just fine irrespective.
 
 * The Pitch: Sample Application Code
 Here's how you can write Clojure code, using *Compojure*, with Springboot.
