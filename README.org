@@ -1,18 +1,71 @@
 * What is spring-boot-bugger?
 
-Note: Not intended for production, but simplifies paving the way for you to pitch Clojure to your app/organization.
-
-Ever wished to introduce Clojure into your enterprisey SpringBoot app (organization?)
-1. But not want to add much noise to your ~build.gradle~ for injecting Clojure
-2. Want to start very small - ~nrepl~ and a ring-like sub-module - and then use REPL-power for live-coding and adding new functionality
+Ever wished to introduce Clojure into your SpringBoot app (organization)?
+And, want to start very small - ~nrepl~ and a ring-like sub-module - and then use REPL-power for live-coding and adding new functionality?
 
 Then, ~spring-boot-bugger~ simplifies it for you!
 
-If you want a complete example of how it works, check out [[https://github.com/jaju/spring-boot-bugger-example][jaju/spring-boot-bugger-example]].
+A complete example of how it works can be found at [[https://github.com/jaju/spring-boot-bugger-example][jaju/spring-boot-bugger-example]].
 
 * The Pitch: Sample Application Code
-** Configure Springboot Application
-By default, port 7888 is used. But add /nrepl.port/ to your application.properties (or equivalent) file as follows
+Here's how you can write Clojure code, using *Compojure*, with Springboot.
+The interface is _ring like_ - Mostly ring, but with a few quirks that should not matter for most common use-cases.
+
+** Configure Gradle
+*** Modify ~build.gradle[.kt]~
+#+begin_src kotlin
+repositories {
+    maven {
+        name = "Clojars"
+        url = uri("https://clojars.org/repo")
+    }
+    // If using the SNAPSHOT version of spring-boot-bugger
+    maven {
+        name("Sonatype Snapshots")
+        url("https://oss.sonatype.org/content/repositories/snapshots")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+}
+
+dependencies {
+    developmentOnly("org.msync:spring-boot-bugger:0.2.0-SNAPSHOT")
+    developmentOnly("compojure:compojure:1.6.2")
+}
+#+end_src
+*** Ensure your clojure code is copied to the classpath
+Assuming you will write your clojure code in ~src/main/clojure~
+
+#+begin_src kotlin
+tasks.register<Copy>("copyClojure") {
+    into("build/classes/java/main") {
+        destinationDir = file(".")
+        from("src/main/clojure")
+    }
+}
+
+tasks.getByName("bootRun").dependsOn("copyClojure")
+tasks.getByName("bootJar").dependsOn("copyClojure")
+#+end_src
+
+** Hint Springboot using ~@ComponentScan~
+#+begin_src java
+package com.company.my_application;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+@SpringBootApplication
+@ComponentScan("org.msync.spring_boot_bugger")
+// And other standard stuff
+public class YourApplication {
+    // Your code here
+}
+#+end_src
+
+** Modify ~application.yml~ (or ~application.properties~)
+By default, port 7888 is used. But add ~clojure-component.nrepl-port~ to your ~application.yml~ (or equivalent) file as follows
 
 #+begin_src yaml
 # ...
@@ -27,6 +80,8 @@ clojure-component:
 ** Write code
 Here is an example code - using Compojure - that you can use in your SpringBoot application!
 It works along-side your existing Java code, without interfering, and you can access Clojure from your Java, and vice-versa!
+
+This is stock *Compojure* code example.
 #+begin_src clojure
 (ns org.msync.spring-clj.core
   (:require [org.msync.spring-boot-bugger :as bugger]
@@ -55,84 +110,10 @@ It works along-side your existing Java code, without interfering, and you can ac
 
 Note that the paths are relative to the base path set in ~application.yml~. Hence, ~/echo/:greetings~ will be accessible at ~/internal/clojure/echo/:greetings~.
 
-* Steps for Gradle
-(Modify accordingly for maven)
+** Run "bootRun"
 
-Following these steps allow you to enable /NREPL/ by modifying two files in your repository
-- build.gradle[.kt]
-- .gitignore
-The changes are pretty much inconsequential to your core project codebase and should be easy to push through with possibly non-existent pushback.
+And, *run*!
 
-These steps are *suggestive* and you can tweak - especially the names of files
-
-*** Add the following to your ~.gitignore~
-#+begin_example
-/dev.gradle**
-/**/DevWorx.java
-#+end_example
-
-*** Create ~dev.gradle.kt~ (or ~dev.gradle.kt~)
-(Or whatever name you'd like - match it with the entry in ~.gitignore~)
-#+begin_src kotlin
-repositories {
-    maven {
-        name = "Clojars"
-        url = uri("https://clojars.org/repo")
-    }
-    maven {
-        name("Sonatype Snapshots")
-        url("https://oss.sonatype.org/content/repositories/snapshots")
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
-}
-
-dependencies {
-    developmentOnly("org.msync:spring-boot-bugger:0.2.0-SNAPSHOT")
-    developmentOnly("compojure:compojure:1.6.2")
-}
-#+end_src
-
-*** Update ~build.gradle.kts~ (or ~build.gradle~ if using Groovy)
-Add the following to your ~build.gradle.kts~ - this allows you to tweak your build-script via an optionally present file.
-#+begin_src kotlin
-if (File("dev.gradle.kt").isFile) {
-    apply("dev.gradle.kt")
-}
-#+end_src
-
-*** Add a Java file to your codebase
-Name this file ~DevWorx.java~ (to match your .gitignore entry), and keep it at an appropriate place - your base package
-Assuming your base package is ~com.company.my_application~, the file should be created at *src/main/java/com/company/my_application/DevWorx.java*, unless you are not using standard Java+Gradle locations.
-#+begin_src java
-package com.company.my_application;
-
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
-
-@Component
-@ComponentScan("org.msync.spring_boot_bugger")
-public class DevWorx {
-}
-#+end_src
-
-*** Ensure your clojure code is copied to the classpath
-Here's some sample gradle config to help you do that. Assuming your clojure code is in ~src/main/clojure~
-
-#+begin_src kotlin
-tasks.register<Copy>("copyClojure") {
-    into("build/classes/java/main") {
-        destinationDir = file(".")
-        from("src/main/clojure")
-    }
-}
-
-tasks.getByName("bootRun").dependsOn("copyClojure")
-tasks.getByName("bootJar").dependsOn("copyClojure")
-#+end_src
-
-* Run "bootRun"
 #+begin_src bash
 ./gradlew bootRun
 #+end_src
@@ -148,7 +129,8 @@ And you should see something like the following
 #+END_QUOTE
 
 * Connect to the NREPL
-And hack away to glory!
+
+Starting ~nREPL~ by default can be controlled via configuration. But you can easily start/stop ~nREPL~ using two exposed end-points, that take *POST* requests.
 
 For your convenience, there's a namespace you can switch to and get hold of the ~ApplicationContext~ object via the /state/ atom's ~:ctx~ key.
 
@@ -160,10 +142,8 @@ user> @org.msync.spring-boot-bugger.application-context/state
               "org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext@333bd779, started on Wed Sep 01 21:47:28 IST 2021"]}
 #+end_src
 
-* Control the NREPL service via an end-point
 
-Pretty crude controls. Modify host, port and the path-prefix depending on how you've configured it in your ~application.yml~.
-
+** Control the NREPL server
 *** Start it
 #+begin_src bash
 curl -XPOST http://host:port/internal/clojure/nrepl-start
