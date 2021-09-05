@@ -12,7 +12,8 @@ Here's how you can write Clojure code, using *Compojure*, with Springboot.
 The interface is _ring like_ - Mostly ring, but with a few quirks that should not matter for most common use-cases.
 
 ** Configure Gradle
-*** Modify ~build.gradle[.kt]~
+*** Modify ~build.gradle.kts~ (or, ~build.gradle~)
+This is the Gradle-Kotlin version.
 #+begin_src kotlin
 repositories {
     maven {
@@ -21,8 +22,8 @@ repositories {
     }
     // If using the SNAPSHOT version of spring-boot-bugger
     maven {
-        name("Sonatype Snapshots")
-        url("https://oss.sonatype.org/content/repositories/snapshots")
+        name = "Sonatype Snapshots"
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
         mavenContent {
             snapshotsOnly()
         }
@@ -30,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    developmentOnly("org.msync:spring-boot-bugger:0.2.0-SNAPSHOT")
+    developmentOnly("org.msync:spring-boot-bugger:0.2.0-alpha1")
     developmentOnly("compojure:compojure:1.6.2")
 }
 #+end_src

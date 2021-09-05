@@ -1,4 +1,4 @@
-(def version "0.2.0-SNAPSHOT")
+(def version "0.2.0-alpha1")
 (def spring-version "5.3.9")
 (def spring-boot-version "2.5.4")
 (def core-version "1.10.3")
