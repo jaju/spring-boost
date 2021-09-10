@@ -1,4 +1,4 @@
-(ns org.msync.spring-boot-bugger.application-context
+(ns org.msync.spring-boost.application-context
   (:import [org.springframework.core.env Environment]
            [java.util Map]
            [org.springframework.context ApplicationContext]
@@ -10,7 +10,7 @@
 (gen-class
   :name
   ^{org.springframework.stereotype.Component ""}
-  org.msync.spring_boot_bugger.ClojureComponent
+  org.msync.spring_boost.ClojureComponent
   :state _
   :prefix "-"
   :constructors {[org.springframework.context.ApplicationContext] []}

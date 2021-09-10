@@ -1,14 +1,12 @@
-package org.msync.spring_boot_bugger;
+package org.msync.spring_boost;
 
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
-import clojure.lang.Namespace;
 import clojure.lang.Symbol;
 import clojure.lang.Var;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -16,14 +14,15 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
-import static org.msync.spring_boot_bugger.Utils.*;
+
+import static org.msync.spring_boost.Utils.require;
 
 /**
  * The main bean, that installs the core routes for the SpringBootBugger system, that enable
  * 1. The nREPL start/stop end-points
  * 2. The root route handler for this sub-system
  */
-public class Bugger {
+public class Boost {
 
     private final int nreplPort;
     private final ApplicationContext applicationContext;
@@ -31,7 +30,7 @@ public class Bugger {
     private static final IFn serverStartFn;
     private static final IFn serverStopFn;
     private static Object server;
-    private static final Logger logger = Logger.getLogger(Bugger.class.getName());
+    private static final Logger logger = Logger.getLogger(Boost.class.getName());
 
 
     static {
@@ -118,7 +117,7 @@ public class Bugger {
         }
     }
 
-    public Bugger(int nreplPort, ApplicationContext applicationContext, boolean isNreplStart, String appInitSymbol) {
+    public Boost(int nreplPort, ApplicationContext applicationContext, boolean isNreplStart, String appInitSymbol) {
         this.nreplPort = nreplPort;
         this.applicationContext = applicationContext;
         if (isNreplStart)

@@ -1,18 +1,18 @@
-(def version "0.2.0-alpha1")
+(def version "0.2.0-SNAPSHOT")
+(def core-version "1.10.3")
 (def spring-version "5.3.9")
 (def spring-boot-version "2.5.4")
-(def core-version "1.10.3")
 
-(defproject org.msync/spring-boot-bugger version
+(defproject org.msync/spring-boost version
 
   :description "Just add dependency, sprinkle some config, and run Clojure in your Springboot application."
 
-  :url "https://github.com/jaju/spring-boot-bugger"
+  :url "https://github.com/jaju/spring-boost"
 
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
 
-  :scm {:name "git" :url "https://github.com/jaju/spring-boot-bugger"}
+  :scm {:name "git" :url "https://github.com/jaju/spring-boost"}
 
   :pom-addition [:developers [:developer [:name "Ravindra R. Jaju"]]]
 
@@ -35,10 +35,11 @@
   :javac-options ["-source" "11" "-target" "11"]
 
   :dependencies [[org.clojure/clojure ~core-version]
-                 [nrepl "0.8.3"]]
+                 [nrepl/nrepl "0.8.3"]
+                 [missionary "b.22"]]
 
-  :javadoc-opts {:package-names ["org.msync.spring_boot_bugger"]
-                 :additional-args ["-windowtitle" "SpringBoot Bugger Javadoc"
+  :javadoc-opts {:package-names ["org.msync.spring_boost"]
+                 :additional-args ["-windowtitle" "Spring Boost Javadoc"
                                    "-quiet"
                                    "-link" "https://docs.oracle.com/en/java/javase/11/docs/api/"
                                    "-link" ~(str "https://www.javadoc.io/static/org.clojure/clojure/" core-version)
@@ -51,11 +52,11 @@
                           :omit-source true
                           :filespecs ^:replace [{:type :path, :path "javadoc"}]}}
 
-  :repl-options {:init-ns org.msync.spring-boot-bugger}
+  :repl-options {:init-ns org.msync.spring-boost}
 
-  :aot [org.msync.spring-boot-bugger.application-context]
+  :aot [org.msync.spring-boost.application-context]
 
-  :jar-inclusions [#"spring-boot-bugger-*-sources.jar"]
+  :jar-inclusions [#"spring-boost-*-sources.jar"]
 
   :repositories {"snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots"}}
 
