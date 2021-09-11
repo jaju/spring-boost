@@ -35,8 +35,7 @@
   :javac-options ["-source" "11" "-target" "11"]
 
   :dependencies [[org.clojure/clojure ~core-version]
-                 [nrepl/nrepl "0.8.3"]
-                 [missionary "b.22"]]
+                 [nrepl/nrepl "0.8.3"]]
 
   :javadoc-opts {:package-names ["org.msync.spring_boost"]
                  :additional-args ["-windowtitle" "Spring Boost Javadoc"
@@ -45,7 +44,7 @@
                                    "-link" ~(str "https://www.javadoc.io/static/org.clojure/clojure/" core-version)
                                    "-link" ~(str "https://javadoc.io/doc/org.springframework/spring-beans/" spring-version)
                                    "-link" ~(str "https://javadoc.io/doc/org.springframework/spring-web/" spring-version)
-                                   #_"-link" #_"https://projectreactor.io/docs/core/release/api/"]}
+                                   "-link" "https://projectreactor.io/docs/core/release/api/"]}
 
   :classifiers {:sources {:prep-tasks ^:replace []}
                 :javadoc {:prep-tasks ^:replace ["javadoc"]
@@ -61,8 +60,8 @@
   :repositories {"snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots"}}
 
   :deploy-repositories {
-                        "releases" {:url "https://oss.sonatype.org/service/local/staging/deploy/maven2" :creds :gpg}
-                        "snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots" :creds :gpg}
+                        "releases" :clojars ;{:url "https://oss.sonatype.org/service/local/staging/deploy/maven2" :creds :gpg}
+                        "snapshots" :clojars ;{:url "https://oss.sonatype.org/content/repositories/snapshots" :creds :gpg}
                         }
 
   )
