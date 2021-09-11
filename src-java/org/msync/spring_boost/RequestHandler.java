@@ -4,6 +4,7 @@ import clojure.lang.Keyword;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -27,10 +28,12 @@ import static org.msync.spring_boost.Utils.*;
 public class RequestHandler {
 
     private final String rootPath;
+    private final Boost boost;
     private static final Logger logger = Logger.getLogger(RequestHandler.class.getName());
 
-    public RequestHandler(String rootPath) {
+    public RequestHandler(String rootPath, Boost boost) {
         this.rootPath = rootPath;
+        this.boost = boost;
     }
 
     private String prunePath(String path) {
@@ -65,9 +68,9 @@ public class RequestHandler {
         var headers = (Map<Object, String>) clojureResponse.get(keyword("headers"));
         Object body = clojureResponse.get(keyword("body"));
 
-        logger.info(() -> "Response Status = " + status);
-        logger.info(() -> "Response Headers = " + headers);
-        logger.info(() -> "Response Body = " + body);
+        logger.log(Level.FINE, () -> "Response Status = " + status);
+        logger.log(Level.FINE, () -> "Response Headers = " + headers);
+        logger.log(Level.FINE, () -> "Response Body = " + body);
         return ServerResponse.status(status.intValue())
             .headers(h -> {
                 for (var key : headers.keySet()) {
@@ -78,10 +81,53 @@ public class RequestHandler {
     }
 
     /**
+     * Endpoint to request starting of the nrepl-server
+     *
+     * @param request - The request object
+     * @return void
+     */
+    public Mono<ServerResponse> startNreplHandler(ServerRequest request) {
+        try {
+            boost.startNrepl();
+            return ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("status", "started"));
+        } catch (Exception e) {
+            return ServerResponse
+                .status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("status", "error"));
+        }
+    }
+
+    /**
+     * Endpoint to request stopping of the nrepl-server
+     *
+     * @param request - The request object
+     * @return void
+     */
+    public Mono<ServerResponse> stopNreplHandler(ServerRequest request) {
+        try {
+            boost.stopNrepl();
+            return ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("status", "stopped"));
+        } catch (Exception e) {
+            return ServerResponse
+                .status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("status", "error"));
+        }
+    }
+
+
+    /**
      * @param request - ServerRequest object as initialized by Spring
      * @return - The response
      */
-    public Mono<ServerResponse> requestHandler(ServerRequest request) {
+    public Mono<ServerResponse> httpRequestHandler(ServerRequest request) {
         String uri = prunePath(request.path());
         Mono<MultiValueMap<String, String>> formData = request.formData();
 
@@ -95,11 +141,11 @@ public class RequestHandler {
             return parsed.flatMap(b -> {
                 logger.log(Level.FINER, () -> "We have a body: " + b);
                 var updatedRequest = assocFn.invoke(clojureRequest, keyword("body"), b);
-                Map<Keyword, Object> response = (Map<Keyword, Object>) rootHandlerFn.invoke(updatedRequest);
+                Map<Keyword, Object> response = (Map<Keyword, Object>) httpHandlerFn.invoke(updatedRequest);
                 return updateResponse(response);
             });
         }
-        Map<Keyword, Object> response = (Map<Keyword, Object>) rootHandlerFn.invoke(clojureRequest);
+        Map<Keyword, Object> response = (Map<Keyword, Object>) httpHandlerFn.invoke(clojureRequest);
         return updateResponse(response);
     }
 
@@ -116,20 +162,13 @@ public class RequestHandler {
         payload = "Hello, " + payload;
         byte[] bytes = payload.getBytes(StandardCharsets.UTF_8);
         var processed = dataBufferFactory.wrap(bytes);
-        return new WebSocketMessage(WebSocketMessage.Type.TEXT, processed);
+        return new WebSocketMessage(WebSocketMessage.Type.BINARY, processed);
     }
 
     public WebSocketHandler webSocketSessionHandler() {
         return (WebSocketSession wsSession) -> {
-            String id = wsSession.getId();
-            DataBufferFactory dataBufferFactory = wsSession.bufferFactory();
-            HandshakeInfo handshakeInfo = wsSession.getHandshakeInfo();
-            handshakeInfo.getHeaders();
-            handshakeInfo.getUri();
-            handshakeInfo.getCookies();
-            handshakeInfo.getRemoteAddress();
-            Flux<WebSocketMessage> stringFlux = wsSession.receive()
-                .map(this::webSocketMessageHandler);
+            Flux<WebSocketMessage> stringFlux =
+                (Flux<WebSocketMessage>) websocketHandlerFn.invoke(wsSession);
             return wsSession.send(stringFlux);
         };
     }

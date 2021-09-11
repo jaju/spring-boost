@@ -22,7 +22,7 @@ public class Utils {
     public static final IFn dissocFn;
     public static final IFn stringifyKeysFn;
     public static final IFn toRingSpecFn;
-    public static final IFn rootHandlerFn;
+    public static final IFn httpHandlerFn;
     public static final IFn websocketHandlerFn;
     public static final IFn setHandlerFn;
     public static final IFn setWebSocketHandlerFn;
@@ -38,7 +38,7 @@ public class Utils {
         dissocFn = Clojure.var("clojure.core", "dissoc");
         stringifyKeysFn = Clojure.var("clojure.walk", "stringify-keys");
         toRingSpecFn = Clojure.var("org.msync.spring-boost.ring-like", "to-ring-spec");
-        rootHandlerFn = Clojure.var("org.msync.spring-boost", "-root-handler");
+        httpHandlerFn = Clojure.var("org.msync.spring-boost", "-http-handler");
         websocketHandlerFn = Clojure.var("org.msync.spring-boost", "-websocket-handler");
         setHandlerFn = Clojure.var("org.msync.spring-boost", "set-handler!");
         setWebSocketHandlerFn = Clojure.var("org.msync.spring-boost", "set-websocket-handler!");

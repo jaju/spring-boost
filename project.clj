@@ -45,7 +45,7 @@
                                    "-link" ~(str "https://www.javadoc.io/static/org.clojure/clojure/" core-version)
                                    "-link" ~(str "https://javadoc.io/doc/org.springframework/spring-beans/" spring-version)
                                    "-link" ~(str "https://javadoc.io/doc/org.springframework/spring-web/" spring-version)
-                                   "-link" "https://projectreactor.io/docs/core/release/api/"]}
+                                   #_"-link" #_"https://projectreactor.io/docs/core/release/api/"]}
 
   :classifiers {:sources {:prep-tasks ^:replace []}
                 :javadoc {:prep-tasks ^:replace ["javadoc"]

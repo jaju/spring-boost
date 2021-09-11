@@ -21,9 +21,10 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 @Configuration
 @ConfigurationProperties(prefix = "clojure-component")
-public class BoosterConfiguration {
+public class BoostConfiguration {
     private int nreplPort;
     private String rootPath;
+    private String wsPath;
     private boolean nreplStart = false;
     private String appInitSymbol;
     @Autowired
@@ -43,6 +44,14 @@ public class BoosterConfiguration {
         this.rootPath = rootPath;
     }
 
+    public String getWsPath() {
+        return wsPath;
+    }
+
+    public void setWsPath(String wsPath) {
+        this.wsPath = wsPath;
+    }
+
     boolean isNreplStart() {
         return nreplStart;
     }
@@ -59,13 +68,13 @@ public class BoosterConfiguration {
     }
 
     @Bean
-    RequestHandler requestHandler() {
-        return new RequestHandler(this.rootPath);
+    RequestHandler requestHandler(Boost boost) {
+        return new RequestHandler(this.rootPath, boost);
     }
 
     @Bean
     Boost createBoost() {
-        return new Boost(this.nreplPort, this.applicationContext, this.nreplStart, this.appInitSymbol);
+        return new Boost(this.applicationContext, this.nreplPort, this.nreplStart, this.appInitSymbol);
     }
 
     private String expandedPath(String path) {
@@ -76,9 +85,9 @@ public class BoosterConfiguration {
     @Bean
     public RouterFunction<ServerResponse> route(RequestHandler requestHandler, Boost boost) {
         return RouterFunctions
-            .route(POST(expandedPath("/stop-nrepl")), boost::stopNreplHandler)
-            .andRoute(POST(expandedPath("/start-nrepl")), boost::startNreplHandler)
-            .andRoute(RequestPredicates.path(expandedPath("/**")), requestHandler::requestHandler);
+            .route(POST(expandedPath("/stop-nrepl")), requestHandler::stopNreplHandler)
+            .andRoute(POST(expandedPath("/start-nrepl")), requestHandler::startNreplHandler)
+            .andRoute(RequestPredicates.path(expandedPath("/**")), requestHandler::httpRequestHandler);
     }
 
     @Bean
@@ -93,5 +102,4 @@ public class BoosterConfiguration {
         int order = -1; // before annotated controllers
         return new SimpleUrlHandlerMapping(map, order);
     }
-
 }

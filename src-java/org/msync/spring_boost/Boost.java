@@ -5,31 +5,24 @@ import clojure.lang.IFn;
 import clojure.lang.Symbol;
 import clojure.lang.Var;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.msync.spring_boost.Utils.require;
 
 /**
- * The main bean, that installs the core routes for the SpringBootBugger system, that enable
- * 1. The nREPL start/stop end-points
- * 2. The root route handler for this sub-system
+ * Holds the run-time states
  */
-public class Boost {
+class Boost {
 
     private final int nreplPort;
     private final ApplicationContext applicationContext;
+    private Object server;
 
     private static final IFn serverStartFn;
     private static final IFn serverStopFn;
-    private static Object server;
     private static final Logger logger = Logger.getLogger(Boost.class.getName());
 
 
@@ -48,7 +41,7 @@ public class Boost {
         var.invoke(applicationContext);
     }
 
-    private synchronized void startNrepl() {
+    protected synchronized void startNrepl() {
         if (Objects.nonNull(server)) {
             throw new RuntimeException("NREPL service already running.");
         }
@@ -56,12 +49,12 @@ public class Boost {
             server = serverStartFn.invoke(Clojure.read(":port"), nreplPort);
             logger.info(() -> "nREPL server started on port = " + nreplPort);
         } catch (Exception e) {
-            logger.warning(() -> "Could not start nREPL... " + e.getMessage());
+            logger.log(Level.SEVERE, () -> "Could not start nREPL... " + e.getMessage());
             throw e;
         }
     }
 
-    private synchronized void stopNrepl() {
+    protected synchronized void stopNrepl() {
         if (Objects.isNull(server)) {
             throw new RuntimeException("nREPL server is already stopped.");
         }
@@ -75,51 +68,9 @@ public class Boost {
         }
     }
 
-    /**
-     * Endpoint to request starting of the nrepl-server
-     *
-     * @param request - The request object
-     * @return void
-     */
-    public Mono<ServerResponse> startNreplHandler(ServerRequest request) {
-        try {
-            startNrepl();
-            return ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("status", "started", "port", nreplPort));
-        } catch (Exception e) {
-            return ServerResponse
-                .status(HttpStatus.CONFLICT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("status", "error"));
-        }
-    }
-
-    /**
-     * Endpoint to request stopping of the nrepl-server
-     *
-     * @param request - The request object
-     * @return void
-     */
-    public Mono<ServerResponse> stopNreplHandler(ServerRequest request) {
-        try {
-            stopNrepl();
-            return ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("status", "stopped", "port", nreplPort));
-        } catch (Exception e) {
-            return ServerResponse
-                .status(HttpStatus.CONFLICT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("status", "error"));
-        }
-    }
-
-    public Boost(int nreplPort, ApplicationContext applicationContext, boolean isNreplStart, String appInitSymbol) {
-        this.nreplPort = nreplPort;
+    public Boost(ApplicationContext applicationContext, int nreplPort, boolean isNreplStart, String appInitSymbol) {
         this.applicationContext = applicationContext;
+        this.nreplPort = nreplPort;
         if (isNreplStart)
             startNrepl();
         if (Objects.nonNull(appInitSymbol)) {
