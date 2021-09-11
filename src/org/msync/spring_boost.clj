@@ -51,7 +51,7 @@
      :remote-address remote-address}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn ^"[B" string->bytes [s] (.getBytes s StandardCharsets/UTF_8))
+(defn ^bytes string->bytes [s] (.getBytes s StandardCharsets/UTF_8))
 (defn- ^WebSocketMessage wrap-message-handler [message-handler]
   (fn [^WebSocketMessage message]
     (let [typ (.getType message)
