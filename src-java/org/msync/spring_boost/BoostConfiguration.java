@@ -33,6 +33,7 @@ public class BoostConfiguration {
     int getNreplPort() {
         return nreplPort;
     }
+
     void setNreplPort(int nreplPort) {
         this.nreplPort = nreplPort;
     }
@@ -40,6 +41,7 @@ public class BoostConfiguration {
     String getRootPath() {
         return rootPath;
     }
+
     void setRootPath(String rootPath) {
         this.rootPath = rootPath;
     }
@@ -55,6 +57,7 @@ public class BoostConfiguration {
     boolean isNreplStart() {
         return nreplStart;
     }
+
     void setNreplStart(boolean nreplStart) {
         this.nreplStart = nreplStart;
     }
@@ -98,7 +101,8 @@ public class BoostConfiguration {
     @Bean
     public HandlerMapping handlerMapping(WebSocketHandler webSocketHandler) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(expandedPath("/ws"), webSocketHandler);
+        if (Objects.nonNull(wsPath))
+            map.put(expandedPath(wsPath), webSocketHandler);
         int order = -1; // before annotated controllers
         return new SimpleUrlHandlerMapping(map, order);
     }
