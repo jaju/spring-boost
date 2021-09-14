@@ -126,7 +126,7 @@ clojure-component:
   nrepl-start: true
   root-path: /clojure
   ws-path: /ws
-  app-init-symbol: org.msync.spring-clj.core/main
+  init-symbol: org.msync.spring-clj.core/main
 # ...
 #+end_src
 

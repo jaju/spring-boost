@@ -26,7 +26,7 @@ public class BoostConfiguration {
     private String rootPath;
     private String wsPath;
     private boolean nreplStart = false;
-    private String appInitSymbol;
+    private String initSymbol;
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -62,12 +62,12 @@ public class BoostConfiguration {
         this.nreplStart = nreplStart;
     }
 
-    public String getAppInitSymbol() {
-        return appInitSymbol;
+    public String getInitSymbol() {
+        return initSymbol;
     }
 
-    public void setAppInitSymbol(String appInitSymbol) {
-        this.appInitSymbol = appInitSymbol;
+    public void setInitSymbol(String initSymbol) {
+        this.initSymbol = initSymbol;
     }
 
     @Bean
@@ -77,7 +77,7 @@ public class BoostConfiguration {
 
     @Bean
     Boost createBoost() {
-        return new Boost(this.applicationContext, this.nreplPort, this.nreplStart, this.appInitSymbol);
+        return new Boost(this.applicationContext, this.nreplPort, this.nreplStart, this.initSymbol);
     }
 
     private String expandedPath(String path) {
