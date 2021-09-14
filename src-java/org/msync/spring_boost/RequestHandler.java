@@ -1,22 +1,18 @@
 package org.msync.spring_boost;
 
 import clojure.lang.Keyword;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -40,13 +36,12 @@ public class RequestHandler {
         return path.substring(rootPath.length());
     }
 
-    static private Map<MediaType, Class<?>> mediaTypeToClass = Map.of(
+    static private final Map<MediaType, Class<?>> mediaTypeToClass = Map.of(
         MediaType.APPLICATION_JSON, Map.class,
         MediaType.APPLICATION_FORM_URLENCODED, MultiValueMap.class
     );
 
-    private static Class<?> contentTypeToJavaType(String contentType) {
-        MediaType mt = MediaType.valueOf(contentType);
+    private static Class<?> contentTypeToJavaType(MediaType mt) {
         Class<?> known = mediaTypeToClass.get(mt);
 
         if (Objects.isNull(known)) {
@@ -129,41 +124,42 @@ public class RequestHandler {
      */
     public Mono<ServerResponse> httpRequestHandler(ServerRequest request) {
         String uri = prunePath(request.path());
-        Mono<MultiValueMap<String, String>> formData = request.formData();
 
         final var clojureRequest = (Map<Keyword, Object>) toRingSpecFn.invoke(uri, request);
 
         if (httpMethodsWithBody.contains(request.method())) {
-            var headers = (Map<String, String>) clojureRequest.get(keyword("headers"));
-            var contentType = headers.get("content-type");
-            var inferredClass = contentTypeToJavaType(contentType);
-            var parsed = request.bodyToMono(inferredClass);
-            return parsed.flatMap(b -> {
-                logger.log(Level.FINER, () -> "We have a body: " + b);
-                var updatedRequest = assocFn.invoke(clojureRequest, keyword("body"), b);
-                Map<Keyword, Object> response = (Map<Keyword, Object>) httpHandlerFn.invoke(updatedRequest);
-                return updateResponse(response);
-            });
+            return handleRequestWithBody(request, clojureRequest);
         }
+
         Map<Keyword, Object> response = (Map<Keyword, Object>) httpHandlerFn.invoke(clojureRequest);
         return updateResponse(response);
     }
 
-    // Websockets
+    private Mono<ServerResponse> handleRequestWithBody(ServerRequest request, Map<Keyword, Object> clojureRequest) {
+        var headers = (Map<String, String>) clojureRequest.get(keyword("headers"));
+        var contentType = (String) headers.get("content-type");
+        var mediaType = MediaType.valueOf(contentType);
 
-    private WebSocketMessage webSocketMessageHandler(WebSocketMessage message) {
+        var payload = (Mono<?>) null;
+        var payloadType = (String) null;
 
-        DataBuffer dataBuffer = message.getPayload();
-        DataBufferFactory dataBufferFactory = dataBuffer.factory();
+        if (mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+            payloadType = "form-data";
+            payload = request.formData();
+        } else {
+            payloadType = "body";
+            payload = request.bodyToMono(contentTypeToJavaType(mediaType));
+        }
 
-        System.out.println("Received message of type: " + message.getType());
-
-        String payload = dataBuffer.toString(StandardCharsets.UTF_8);
-        payload = "Hello, " + payload;
-        byte[] bytes = payload.getBytes(StandardCharsets.UTF_8);
-        var processed = dataBufferFactory.wrap(bytes);
-        return new WebSocketMessage(WebSocketMessage.Type.BINARY, processed);
+        var kwPayloadType = keyword(payloadType);
+        return payload.flatMap(b -> {
+            var updatedRequest = assocFn.invoke(clojureRequest, kwPayloadType, b);
+            Map<Keyword, Object> response = (Map<Keyword, Object>) httpHandlerFn.invoke(updatedRequest);
+            return updateResponse(response);
+        });
     }
+
+    // Websockets
 
     public WebSocketHandler webSocketSessionHandler() {
         return (WebSocketSession wsSession) -> {

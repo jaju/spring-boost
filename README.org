@@ -15,6 +15,61 @@ But ~nREPL~ will work just fine irrespective.
 Here's how you can write Clojure code, using *Compojure*, with Springboot.
 The interface is _ring like_ - Mostly ring, but with a few quirks that should not matter for most common use-cases.
 
+** What will my Clojure look like?
+Here is an example code that you can use in your SpringBoot application!
+It works along-side your existing Java code, without interfering, and you can access Clojure from your Java.
+
+The following code shows
+1. Setting up end-points - routes and all - with Compojure
+2. Setting up a websocket handler - builds on top of Springboot's websocket infrastructure.
+
+#+begin_src clojure
+(ns org.msync.spring-clj.core
+  (:require [org.msync.spring-boost :as boost]
+            [compojure.core :refer :all]
+            [compojure.route :refer [not-found]]
+            [clojure.string])
+  (:import [java.util.logging Logger]
+           [org.springframework.context ApplicationContext]))
+
+(defonce logger (Logger/getLogger (str *ns*)))
+
+(defroutes app
+  "Root hello-world GET endpoint, and another echo end-point that handles both GET and POST.
+  The :body entry in the request-map comes in either as a map for JSON requests, or as a String
+  for other types."
+  (GET "/" [:as {query-string :query-string}]
+       (str "<h1>Hello World.</h1>"
+            (if-not (clojure.string/blank? query-string) (str "We received a query-string " query-string))))
+  (GET "/echo/:greeter" [greeter]
+       {:status 200
+        :headers {:content-type "application/json"}
+        :body {:greeting (str "Hello, " greeter)}})
+  (POST "/echo/:greeter" [greeter :as request]
+        {:status 200
+         :headers {:content-type "application/json"}
+         :body {:greetings (str "Hello, " greeter)
+                :echo (:body request)}})
+  (not-found "<h1>Page not found</h1>"))
+
+(defn web-socket-handler [session]
+  (pr-str session)
+  ;; Use the session as you wish - to create session-specific handlers
+  (fn [^String message]
+    (str "Hello, " (.toUpperCase message))))
+
+(defn main
+  "Set this as your entry-point for the Clojure code in your spring-boot app.
+  Gets the ApplicationContext object as an argument - which you are free to ignore or use."
+  [^ApplicationContext application-context]
+
+  (.info logger (str "[spring-clj] Initializing clojure app..."))
+  (boost/set-handler! app)
+  (boost/set-websocket-handler! web-socket-handler))
+#+end_src
+
+Note that the paths are relative to the base path set in ~application.yml~. Hence, ~/echo/:greetings~ will be accessible at ~/clojure/echo/:greetings~.
+
 ** Configure Gradle
 *** Modify ~build.gradle.kts~ (or, ~build.gradle~)
 This is the Gradle-Kotlin version.
@@ -69,63 +124,11 @@ By default, port 7888 is used. But add ~clojure-component.nrepl-port~ to your ~a
 clojure-component:
   nrepl-port: 8190
   nrepl-start: true
-  root-path: /internal/clojure
+  root-path: /clojure
   ws-path: /ws
   app-init-symbol: org.msync.spring-clj.core/main
 # ...
 #+end_src
-
-** Write code
-Here is an example code - using Compojure - that you can use in your SpringBoot application!
-It works along-side your existing Java code, without interfering, and you can access Clojure from your Java, and vice-versa!
-
-This is stock *Compojure* code example.
-#+begin_src clojure
-(ns org.msync.spring-clj.core
-  (:require [org.msync.spring-boost :as boost]
-            [compojure.core :refer :all]
-            [compojure.route :refer [not-found]]
-            [clojure.string])
-  (:import [java.util.logging Logger]
-           [org.springframework.context ApplicationContext]))
-
-(defonce logger (Logger/getLogger (str *ns*)))
-
-(defroutes app
-  "Root hello-world GET endpoint, and another echo end-point that handles both GET and POST.
-  The :body entry in the request-map comes in either as a map for JSON requests, or as a String
-  for other types."
-  (GET "/" [:as {query-string :query-string}]
-       (str "<h1>Hello World.</h1>"
-            (if-not (clojure.string/blank? query-string) (str "We received a query-string " query-string))))
-  (GET "/echo/:greeter" [greeter]
-       {:status 200
-        :headers {:content-type "application/json"}
-        :body {:greeting (str "Hello, " greeter)}})
-  (POST "/echo/:greeter" [greeter :as request]
-        {:status 200
-         :headers {:content-type "application/json"}
-         :body {:greetings (str "Hello, " greeter)
-                :echo (:body request)}})
-  (not-found "<h1>Page not found</h1>"))
-
-(defn web-socket-handler [session]
-  (pr-str session)
-  ;; Use the session as you wish - to create session-specific handlers
-  (fn [^String message]
-    (str "Hello, " (.toUpperCase message))))
-
-(defn main
-  "Set this as your entry-point for the Clojure code in your spring-boot app.
-  Gets the ApplicationContext object as an argument - which you are free to ignore or use."
-  [^ApplicationContext application-context]
-
-  (.info logger (str "[spring-clj] Initializing clojure app..."))
-  (boost/set-handler! app)
-  (boost/set-websocket-handler! web-socket-handler))
-#+end_src
-
-Note that the paths are relative to the base path set in ~application.yml~. Hence, ~/echo/:greetings~ will be accessible at ~/internal/clojure/echo/:greetings~.
 
 ** Run "bootRun"
 
@@ -163,16 +166,13 @@ user> @org.msync.spring-boost.application-context/state
 ** Control the NREPL server
 *** Start it
 #+begin_src bash
-curl -XPOST http://host:port/internal/clojure/nrepl-start
+curl -XPOST http://host:port/clojure/nrepl-start
 #+end_src
 
 *** Stop it
 #+begin_src bash
-curl -XPOST http://host:port/internal/clojure/nrepl-stop
+curl -XPOST http://host:port/clojure/nrepl-stop
 #+end_src
-
-* Caveats
-This is intended (currently) as a purely development-aiding dependency. It's tied to SpringBoot, but can be easily modified for other frameworks like Quarkus.
 
 * License
 

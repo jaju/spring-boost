@@ -1,4 +1,5 @@
 (ns org.msync.spring-boost.application-context
+  (:require [clojure.walk :refer [keywordize-keys]])
   (:import [org.springframework.core.env Environment]
            [java.util Map]
            [org.springframework.context ApplicationContext]
@@ -41,3 +42,10 @@
 
 (defn ^Map beans-with-annotation [^Class annotation]
   (.getBeansWithAnnotation (get-application-context) annotation))
+
+(defn ^Map beans
+  ([] (beans Object))
+  ([^Class clazz] (->> clazz
+                    beans-of-type
+                    (into {})
+                    keywordize-keys)))

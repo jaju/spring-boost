@@ -25,7 +25,10 @@
 
 (let [scheme :http
       http-protocol "HTTP/1.1"]
-  (defn to-ring-spec [^String uri ^ServerRequest request]
+  (defn to-ring-spec
+    "Extracts various attributes, approximating the ring-spec request.
+    But does not consume the body. The body being a Publisher, is better handled in Java."
+    [^String uri ^ServerRequest request]
     (let [^ServerHttpRequest http-request (.getRequest (.exchange request))
           local-address (.getLocalAddress http-request)
           server-port (.getPort local-address)
