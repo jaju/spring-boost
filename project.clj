@@ -1,7 +1,7 @@
 (def version "0.2.0-SNAPSHOT")
 (def core-version "1.10.3")
-(def spring-version "5.3.9")
-(def spring-boot-version "2.5.4")
+(def spring-version "5.3.15")
+(def spring-boot-version "2.6.3")
 
 (defproject org.msync/spring-boost version
 
@@ -35,7 +35,7 @@
   :javac-options ["-source" "11" "-target" "11"]
 
   :dependencies [[org.clojure/clojure ~core-version]
-                 [nrepl/nrepl "0.8.3"]]
+                 [nrepl/nrepl "0.9.0"]]
 
   :javadoc-opts {:package-names ["org.msync.spring_boost"]
                  :additional-args ["-windowtitle" "Spring Boost Javadoc"
