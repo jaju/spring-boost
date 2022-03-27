@@ -32,7 +32,7 @@ class Boost {
         serverStopFn = Clojure.var("nrepl.server", "stop-server");
     }
 
-    private void setInitSymbol(String initSymbol) {
+    private void initialize(String initSymbol) {
         logger.info(() -> "Initializing clojure code: " + initSymbol);
         Var var = (Var) Clojure.var(initSymbol);
         Symbol sym = var.toSymbol();
@@ -74,7 +74,7 @@ class Boost {
         if (isNreplStart)
             startNrepl();
         if (Objects.nonNull(appInitSymbol)) {
-            setInitSymbol(appInitSymbol);
+            initialize(appInitSymbol);
         }
     }
 

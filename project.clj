@@ -1,7 +1,7 @@
 (def version "0.2.0-SNAPSHOT")
-(def core-version "1.10.3")
-(def spring-version "5.3.15")
-(def spring-boot-version "2.6.3")
+(def core-version "1.11.0")
+(def spring-version "5.3.17")
+(def spring-boot-version "2.6.5")
 
 (defproject org.msync/spring-boost version
 
@@ -60,8 +60,8 @@
   :repositories {"snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots"}}
 
   :deploy-repositories {
-                        "releases" :clojars ;{:url "https://oss.sonatype.org/service/local/staging/deploy/maven2" :creds :gpg}
-                        "snapshots" :clojars ;{:url "https://oss.sonatype.org/content/repositories/snapshots" :creds :gpg}
+                        "releases" :clojars #_{:url "https://oss.sonatype.org/service/local/staging/deploy/maven2" :creds :gpg}
+                        "snapshots" :clojars #_{:url "https://oss.sonatype.org/content/repositories/snapshots" :creds :gpg}
                         }
 
   )
