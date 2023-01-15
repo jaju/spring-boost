@@ -16,7 +16,7 @@ import java.io.PipedOutputStream;
 @Component
 public class Utils {
 
-    public static final IFn require;
+    public static final IFn requireFn;
     public static final IFn nameFn;
     public static final IFn assocFn;
     public static final IFn dissocFn;
@@ -28,10 +28,10 @@ public class Utils {
     public static final IFn setWebSocketHandlerFn;
 
     static {
-        require = Clojure.var("clojure.core", "require");
-        require.invoke(Clojure.read("org.msync.spring-boost"));
-        require.invoke(Clojure.read("org.msync.spring-boost.ring-like"));
-        require.invoke(Clojure.read("clojure.walk"));
+        requireFn = Clojure.var("clojure.core", "require");
+        requireFn.invoke(Clojure.read("org.msync.spring-boost"));
+        requireFn.invoke(Clojure.read("org.msync.spring-boost.ring-like"));
+        requireFn.invoke(Clojure.read("clojure.walk"));
 
         nameFn = Clojure.var("clojure.core", "name");
         assocFn = Clojure.var("clojure.core", "assoc");

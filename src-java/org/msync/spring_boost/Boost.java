@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.msync.spring_boost.Utils.require;
+import static org.msync.spring_boost.Utils.requireFn;
 
 /**
  * Holds the run-time states
@@ -27,7 +27,7 @@ class Boost {
 
 
     static {
-        require.invoke(Clojure.read("nrepl.server"));
+        requireFn.invoke(Clojure.read("nrepl.server"));
         serverStartFn = Clojure.var("nrepl.server", "start-server");
         serverStopFn = Clojure.var("nrepl.server", "stop-server");
     }
@@ -37,7 +37,7 @@ class Boost {
         Var var = (Var) Clojure.var(initSymbol);
         Symbol sym = var.toSymbol();
         String ns = sym.getNamespace();
-        require.invoke(Clojure.read(ns));
+        requireFn.invoke(Clojure.read(ns));
         var.invoke(applicationContext);
     }
 
@@ -68,7 +68,7 @@ class Boost {
         }
     }
 
-    public Boost(ApplicationContext applicationContext, int nreplPort, boolean isNreplStart, String appInitSymbol) {
+    protected Boost(ApplicationContext applicationContext, int nreplPort, boolean isNreplStart, String appInitSymbol) {
         this.applicationContext = applicationContext;
         this.nreplPort = nreplPort;
         if (isNreplStart)

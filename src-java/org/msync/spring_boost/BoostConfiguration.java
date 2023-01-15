@@ -27,6 +27,8 @@ public class BoostConfiguration {
     private String wsPath;
     private boolean nreplStart = false;
     private String initSymbol;
+
+    private Boost boost;
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -87,6 +89,7 @@ public class BoostConfiguration {
 
     @Bean
     public RouterFunction<ServerResponse> route(RequestHandler requestHandler, Boost boost) {
+        this.boost = boost;
         return RouterFunctions
             .route(POST(expandedPath("/stop-nrepl")), requestHandler::stopNreplHandler)
             .andRoute(POST(expandedPath("/start-nrepl")), requestHandler::startNreplHandler)

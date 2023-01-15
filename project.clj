@@ -1,7 +1,7 @@
 (def version "0.2.0-SNAPSHOT")
 (def core-version "1.11.1")
-(def spring-version "5.3.20")
-(def spring-boot-version "2.7.0")
+(def spring-version "5.3.25")
+(def spring-boot-version "2.7.7")
 
 (defproject org.msync/spring-boost version
 
@@ -24,7 +24,8 @@
 
              :dev
              {:dependencies
-              [[org.springframework.boot/spring-boot-starter-webflux ~spring-boot-version]]}}
+              [[org.springframework.boot/spring-boot-starter-webflux ~spring-boot-version]
+               [org.springframework.boot/spring-boot-configuration-processor ~spring-boot-version]]}}
 
   :plugins [[org.msync/lein-javadoc "0.4.0-SNAPSHOT"]]
 
@@ -32,10 +33,10 @@
 
   :java-source-paths ["src-java"]
 
-  :javac-options ["-source" "11" "-target" "11"]
+  :javac-options ["-source" "17" "-target" "17"]
 
   :dependencies [[org.clojure/clojure ~core-version]
-                 [nrepl/nrepl "0.9.0"]]
+                 [nrepl/nrepl "1.0.0"]]
 
   :javadoc-opts {:package-names ["org.msync.spring_boost"]
                  :additional-args ["-windowtitle" "Spring Boost Javadoc"
