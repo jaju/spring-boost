@@ -4,7 +4,7 @@
            [org.springframework.web.reactive.function.server ServerRequest]
            [org.springframework.util MultiValueMap]))
 
-;; Reference - https://github.com/ring-clojure/ring/blob/master/SPEC
+;; Reference - https://github.com/ring-clojure/ring/blob/master/SPEC.md
 
 (defn to-ring-headers [^MultiValueMap spring-headers]
   (persistent!
